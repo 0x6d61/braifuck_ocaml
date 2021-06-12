@@ -18,33 +18,31 @@ module Brainfuck = struct
   in func 10000 0 []
   let inc_tape tape ptr c = 
     if c = '+' then
-      take tape ptr @ [List.nth tape ptr +1] @ take (List.rev tape) ((List.length tape-1)-ptr)
+      take tape ptr @ [(List.nth tape ptr) + 1] @ take (List.rev tape) ((List.length tape-1)-ptr)
     else
-      take tape ptr @ [List.nth tape ptr -1] @ take (List.rev tape) ((List.length tape-1)-ptr)
+      take tape ptr @ [(List.nth tape ptr) - 1] @ take (List.rev tape) ((List.length tape-1)-ptr)
   
   let add_tape tape ptr ascii_code = 
     take tape (List.length tape -1 ) @ [ascii_code] @ take (List.rev tape) ((List.length tape-1)-ptr)
 
-  let run list = let rec func list ptr tape = 
-    match list with
-    [] -> tape
-    | first :: rest ->
-      if '>' = first then
-         func rest (ptr+1) tape
-      else if '<' = first then
-        func rest (ptr-1) tape
-      else if '+' = first then
-        func rest ptr (inc_tape tape ptr '+')
-      else if '-' = first then
-        func rest ptr (inc_tape tape ptr '-')
-      else if '.' = first then
-        (
-          print_char (Char.chr (List.nth tape ptr));
-          func rest ptr tape
-        )
-      else if ',' = first then
-        func rest ptr (add_tape tape ptr (Char.code (read_line()).[0]))
-      else
-        func rest ptr tape
-      in func list 0 (make_tape)
+  let run list = let rec func list ptr tape c =
+    if c = List.length list then
+      tape
+    else
+      let now_order = (List.nth list c) in
+        if '>' = now_order then
+          func list (ptr+1) tape (c+1)
+        else if '<' = now_order then
+          func list (ptr-1) tape (c+1)
+        else if '+' = now_order then
+          func list ptr (inc_tape tape ptr '+') (c+1)
+        else if '-' = now_order then
+          func list ptr (inc_tape tape ptr '-') (c+1)
+        else if '.' = now_order then
+            (print_char (Char.chr (List.nth tape ptr));func list ptr tape (c+1))
+        else if ',' = now_order then
+          func list ptr (add_tape tape ptr (Char.code (read_line()).[0])) (c+1)
+        else
+          func list ptr tape c
+    in func list 0 (make_tape) 0
 end
