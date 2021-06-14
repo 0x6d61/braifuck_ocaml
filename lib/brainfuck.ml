@@ -30,7 +30,8 @@ module Brainfuck = struct
                               []
                             else
                             if List.nth list index = '[' then
-                              (index,(braces_right list (index+1) 1)) :: ((braces_right list (index+1) 1),index) :: func (index+1)
+                            let right = braces_right list (index+1) 1 in
+                            (index,right) :: (right,index) :: func (index+1)
                             else
                               func (index+1)
     in func 0
